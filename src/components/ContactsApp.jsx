@@ -15,8 +15,12 @@ import {
 } from "../connections/allContacts";
 import { getFullContactName } from "../helpers/contacts";
 
-const ContactsHeaderWithActions = ({ displayContactForm }, { t }) => (
+const ContactsHeaderWithActions = (
+  { displayContactForm, onFilterChange },
+  { t }
+) => (
   <ContactsHeader
+    onFilterChange={onFilterChange}
     renderActions={() => {
       const fakeintent = new URL(window.location).searchParams.get(
         "fakeintent"
@@ -63,7 +67,8 @@ SelectionBarWithActions.propTypes = {
 class ContactsApp extends React.Component {
   state = {
     displayedContact: null,
-    isCreationFormDisplayed: false
+    isCreationFormDisplayed: false,
+    filteredGroup: null
   };
 
   displayContactCard = contact => {
@@ -122,6 +127,20 @@ class ContactsApp extends React.Component {
     }
   }
 
+  toggleGroupFilter = group => {
+    this.setState({
+      filteredGroup: group
+    });
+  };
+
+  filterContacts = contacts => {
+    const { filteredGroup } = this.state;
+
+    console.log(contacts);
+    return contacts;
+    //    return filteredGroup ? contacts.filter(contact => contact) : contacts
+  };
+
   render() {
     const { displayedContact, isCreationFormDisplayed } = this.state;
     const { t } = this.context;
@@ -138,10 +157,11 @@ class ContactsApp extends React.Component {
         )}
         <ContactsHeaderWithActions
           displayContactForm={this.displayContactForm}
+          onFilterChange={this.toggleGroupFilter}
         />
         <div role="contentinfo">
           <ContactsList
-            contacts={contacts}
+            contacts={this.filterContacts(contacts)}
             onClickContact={this.displayContactCard}
             onSelect={toggleSelection}
             selection={selection}
